@@ -131,11 +131,7 @@ function onClick(event) {
             
             checkWin(x, place, z);
             placed[x][z]+=1;
-            if (turn) {
-                turn = 0;
-            } else {
-                turn = 1;
-            }
+            turn ^= 1;
         }
         
     }
@@ -248,9 +244,10 @@ function win(arr) {
     window.removeEventListener("click", onClick);
     window.removeEventListener("mousemove", onHover);
 
+     let winner1 = turn ^ 1;
     const winner = document.getElementById("winner");
     const winnertext = document.getElementById("text");
-    winnertext.innerText = "Player " + (turn +1) + " Wins "
+    winnertext.innerText = "Player " + (winner1 +1) + " Wins "
     const restart= document.getElementById("restart");
 
     winner.style.display = "block";
