@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import "./styles.css"
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
@@ -26,6 +25,7 @@ function animate() {
 function start() {
     window.addEventListener("mousemove", onHover);
     window.addEventListener("click", onClick);
+    window.addEventListener("touchstart", onTouch);
     placedTiles = []
     spot = [ 
         [ [-1,-1,-1,-1,-1],
@@ -136,7 +136,27 @@ function onClick(event) {
         
     }
 }
-
+function ontouch(event) {
+    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 -1;
+    mouse.y = -(event.touches[0].clientY  / window.innerHeight) * 2 +1;
+    ray.setFromCamera(mouse, camera);
+    const inter = ray.intersectObjects(grid.flat(), false);
+    if (inter.length > 0) {
+        let x = Math.floor(inter[0].object.position.x);
+        let z = Math.floor(inter[0].object.position.z);
+        let item = box[x][z];
+        let place = placed[x][z];
+        if (place < 5) {
+            placedTiles.push(createSquare(1, x, place + .6, z, false, colorchoice()));
+            spot[x][place][z] = turn;
+            
+            checkWin(x, place, z);
+            placed[x][z]+=1;
+            turn ^= 1;
+        }
+        
+    }
+}
 function clear() {
     for (let row of box) {
             for (let square of row) {
