@@ -136,7 +136,7 @@ function onClick(event) {
         
     }
 }
-function ontouch(event) {
+function onTouch(event) {
     mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 -1;
     mouse.y = -(event.touches[0].clientY  / window.innerHeight) * 2 +1;
     ray.setFromCamera(mouse, camera);
@@ -263,6 +263,7 @@ function win(arr) {
     winSquares(arr);
     window.removeEventListener("click", onClick);
     window.removeEventListener("mousemove", onHover);
+    window.removeEventListener("touchstart", onHover);
 
      let winner1 = turn ^ 1;
     const winner = document.getElementById("winner");
