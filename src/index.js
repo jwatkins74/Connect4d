@@ -99,8 +99,8 @@ function onHover(event) {
     mouse.y = -(event.clientY / window.innerHeight) * 2 +1;
     ray.setFromCamera(mouse, camera);
     const inter = ray.intersectObjects(grid.flat(), false);
+    clear();
     if (inter.length > 0) {
-        clear();
         let x = Math.floor(inter[0].object.position.x);
         let z = Math.floor(inter[0].object.position.z);
         let tower = box[x][z];
@@ -243,6 +243,7 @@ function deleteAll() {
     }
 }
 function win(arr) {
+    clear();
     winSquares(arr);
     window.removeEventListener("click", onClick);
     window.removeEventListener("mousemove", onHover);
