@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import {BoxGeometry, MeshBasicMaterial, Mesh, EdgesGeometry, LineBasicMaterial, LineSegments} from "three"
 import "./styles.css"
 import setUp from "./threeStuff";
 
@@ -159,17 +159,17 @@ function createSquare(height = 1, x, y, z, hide = false, color1, box = false) {
     }
     let geo;
     if (!box) {
-        geo = new THREE.BoxGeometry( 1, height, 1 );
+        geo = new BoxGeometry( 1, height, 1 );
     } else {
-        geo = new THREE.BoxGeometry( .1, 10, .1 );
+        geo = new BoxGeometry( .1, 10, .1 );
     }
-    const mat = new THREE.MeshBasicMaterial( params );
-    const cube = new THREE.Mesh( geo, mat );
+    const mat = new MeshBasicMaterial( params );
+    const cube = new Mesh( geo, mat );
     scene.add( cube );
     cube.position.set(x, y, z);
-    const edge = new THREE.EdgesGeometry(geo);
-    const mat2 = new THREE.LineBasicMaterial(params2);
-    const line = new THREE.LineSegments(edge, mat2);
+    const edge = new EdgesGeometry(geo);
+    const mat2 = new LineBasicMaterial(params2);
+    const line = new LineSegments(edge, mat2);
     line.scale.multiplyScalar(1.001);
     cube.add(line);
     return cube;
