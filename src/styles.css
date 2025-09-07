@@ -63,6 +63,7 @@ body{
 }
 #buttonDiv {
     position: fixed;
+    pointer-events: none;
     bottom: 10%;
     display: flex;
     justify-content: center;
