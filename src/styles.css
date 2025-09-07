@@ -41,6 +41,7 @@ body{
 }
 
 .restart{
+    pointer-events: auto;
     display: none;
     color: black;
     padding: 10px;
@@ -52,6 +53,7 @@ body{
     background-color: darkolivegreen;
 }
 #homebutton {
+    pointer-events: auto;
     color: black;
     padding: 10px;
     border: 5px solid black;
