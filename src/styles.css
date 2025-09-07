@@ -1,26 +1,30 @@
+
 body{
     margin: 0;
+    display: flex;
+    justify-content: center;
 }
 .winner {
     display: none;
     position: fixed;
     top: 10px;
-    left: 50%;
     margin: auto auto;
-    background-color: aliceblue;
+    color: black;
     padding: 10px;
-    border: 5px solid black;
+    padding-left: 15%;
+    padding-right: 15%;
+    border: 2px solid black;
     border-radius: 10px;
-    font-size: 20px;
+    font-size: 25px;
+    font-weight: 500;
 }
 
 .restart{
     display: none;
     position: fixed;
     bottom: 10px;
-    left: 50%;
     margin: auto auto;
-    background-color: aliceblue;
+    color: black;
     padding: 10px;
     border: 5px solid black;
     border-radius: 30px;

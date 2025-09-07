@@ -9,6 +9,7 @@
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
+  "homepage": "https://jwatkins74.github.io/Connect4d/",
   "author": "",
   "license": "ISC",
   "description": "",

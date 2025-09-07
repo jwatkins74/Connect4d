@@ -1,31 +1,24 @@
 import * as THREE from "three";
 import "./styles.css"
-import { OrbitControls } from "three/examples/jsm/Addons.js";
+import setUp from "./threeStuff";
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setClearColor(0xff00ff, .25);
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
+//Variables
+let {scene,camera, renderer, ray, mouse} = setUp();
 let placed;
 let spot;
 let turn;
 let grid;
-let box;
+let hoverBoxes;
 let placedTiles;
+let winningSquares;
 start();
 clear();
 
-function animate() {
-    renderer.render( scene, camera );
-}
+
 function start() {
     window.addEventListener("mousemove", onHover);
     window.addEventListener("click", onClick);
-    window.addEventListener("touchstart", onTouch);
+    window.addEventListener("touchend", onTouch, {passive: false});
     placedTiles = []
     spot = [ 
         [ [-1,-1,-1,-1,-1],
@@ -64,16 +57,16 @@ function start() {
         }
         grid.push(row);
     }
-    box = [];
+    hoverBoxes = [];
     for (let i = 0; i <5; i++) {
         let row = [];
 
         for (let j = 0; j < 5; j++) {
-            let cube1 = createSquare(6, i, 3.1, j, true, 0x99ff99);
+            let cube1 = createSquare(6, i, 3.1, j, true, 0x99ff99, true);
             row.push(cube1);
             cube1.userData = "a";
         }
-        box.push(row);
+        hoverBoxes.push(row);
     }
     placed = [
     [0,0,0,0,0],
@@ -83,17 +76,8 @@ function start() {
     [0,0,0,0,0]
     ];
 }
-camera.position.set(2.5,10,2.5);
-camera.lookAt(3,0,3);
-renderer.setAnimationLoop( animate );
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(2.5, 0, 2.5);
-controls.update();
 
-//Ray cast
-const ray = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
+//Interactions
 function onHover(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 -1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 +1;
@@ -103,10 +87,11 @@ function onHover(event) {
     if (inter.length > 0) {
         let x = Math.floor(inter[0].object.position.x);
         let z = Math.floor(inter[0].object.position.z);
-        let tower = box[x][z];
+        let tower = hoverBoxes[x][z];
         let gridbox = grid[x][z];
         //item.material.opacity = 1;
         if (tower.children[0].material.opacity == 0) {
+            tower.visible = true;
             tower.material.opacity = .3;
             tower.children[0].material.opacity = 1;
             gridbox.material.color.set(0x3377ff);
@@ -123,32 +108,34 @@ function onClick(event) {
     if (inter.length > 0) {
         let x = Math.floor(inter[0].object.position.x);
         let z = Math.floor(inter[0].object.position.z);
-        let item = box[x][z];
+        let item = hoverBoxes[x][z];
         let place = placed[x][z];
         if (place < 5) {
-            placedTiles.push(createSquare(1, x, place + .6, z, false, colorchoice()));
+            placedTiles.push(createSquare(1, x, place + .6, z, false, colorchoiceWin()));
             spot[x][place][z] = turn;
-            
-            checkWin(x, place, z);
             placed[x][z]+=1;
-            turn ^= 1;
+            if (checkWin(x, place, z)) {
+                setTimeout( () => {win(winningSquares)}, 50);
+            } else {
+                turn ^= 1;
+            }
         }
         
     }
 }
 function onTouch(event) {
     event.preventDefault();
-    mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 -1;
-    mouse.y = -(event.touches[0].clientY  / window.innerHeight) * 2 +1;
+    mouse.x = (event.changedTouches[0].clientX / window.innerWidth) * 2 -1;
+    mouse.y = -(event.changedTouches[0].clientY  / window.innerHeight) * 2 +1;
     ray.setFromCamera(mouse, camera);
     const inter = ray.intersectObjects(grid.flat(), false);
     if (inter.length > 0) {
         let x = Math.floor(inter[0].object.position.x);
         let z = Math.floor(inter[0].object.position.z);
-        let item = box[x][z];
+        let item = hoverBoxes[x][z];
         let place = placed[x][z];
         if (place < 5) {
-            placedTiles.push(createSquare(1, x, place + .6, z, false, colorchoice()));
+            placedTiles.push(createSquare(1, x, place + .6, z, false, colorchoiceWin()));
             spot[x][place][z] = turn;
             
             checkWin(x, place, z);
@@ -158,21 +145,7 @@ function onTouch(event) {
         
     }
 }
-function clear() {
-    for (let row of box) {
-            for (let square of row) {
-                square.material.opacity = 0;
-                square.children[0].material.opacity = 0;
-        }
-    }
-    for (let row of grid) {
-            for (let square of row) {
-                square.material.color.set(0xffffff);
-        }
-    }
-}
-
-function createSquare(height = 1, x, y, z, hide = false, color1) {
+function createSquare(height = 1, x, y, z, hide = false, color1, box = false) {
     let params;
     let params2;
     if (hide) {
@@ -182,7 +155,12 @@ function createSquare(height = 1, x, y, z, hide = false, color1) {
         params = {color: color1, transparent:true, opacity: 1};
         params2 = {color: 0x000000, transparent:true, opacity: 1};
     }
-    let geo = new THREE.BoxGeometry( 1, height, 1 );
+    let geo;
+    if (!box) {
+        geo = new THREE.BoxGeometry( 1, height, 1 );
+    } else {
+        geo = new THREE.BoxGeometry( .1, 10, .1 );
+    }
     const mat = new THREE.MeshBasicMaterial( params );
     const cube = new THREE.Mesh( geo, mat );
     scene.add( cube );
@@ -194,6 +172,17 @@ function createSquare(height = 1, x, y, z, hide = false, color1) {
     cube.add(line);
     return cube;
 }
+
+
+//Color of placed squares
+function colorchoiceWin(){
+    if (turn) {
+        return  "#E3B505" ;
+    }
+    return "#DE3C4B";
+} 
+
+//Check if game is over
 function checkWin(x,y,z) {
     let color = spot[x][y][z];
     for (let i = -1; i < 2; i++) {
@@ -202,10 +191,13 @@ function checkWin(x,y,z) {
                 if (i ==0 && j ==0 && k ==0) {
                     continue;
                 } 
-                checkPath(x,y,z, i,j,k, color)
+                if (checkPath(x,y,z, i,j,k, color)) {
+                    return true;
+                }
             }
         }
     }
+    return false;
 
 }
 function checkPath(x,y,z, dx,dy,dz, color) {
@@ -242,35 +234,24 @@ function checkPath(x,y,z, dx,dy,dz, color) {
         tempz += dz;
     }
     if (count >= 4) {
-        setTimeout( () => {win(arr)}, 50);
+        winningSquares = arr;
+        return true;
     }
-
-}
-
-function colorchoice(){
-    if (turn) {
-        return 0xffff33;
-    }
-    return 0xe62e00;
-}
-
-function deleteAll() {
-    while (scene.children.length > 0) {
-        scene.remove(scene.children[0]);
-    }
+    return false;
 }
 function win(arr) {
     clear();
     winSquares(arr);
     window.removeEventListener("click", onClick);
     window.removeEventListener("mousemove", onHover);
-    window.removeEventListener("touchstart", onTouch);
+    window.removeEventListener("touchend", onTouch);
 
-     let winner1 = turn ^ 1;
     const winner = document.getElementById("winner");
+    winner.style.backgroundColor = colorchoiceWin();
     const winnertext = document.getElementById("text");
-    winnertext.innerText = "Player " + (winner1 +1) + " Wins "
+    winnertext.innerText = "Player " + (turn +1) + " Wins "
     const restart= document.getElementById("restart");
+    restart.style.backgroundColor = colorchoiceWin();
 
     winner.style.display = "block";
     restart.style.display = "block";
@@ -278,7 +259,7 @@ function win(arr) {
     restart.addEventListener("click", () => {
         winner.style.display = "none";
         restart.style.display = "none";
-        deleteAll();
+        deletePlacedSquares();
         start();
         clear();
 
@@ -294,6 +275,28 @@ function winSquares(arr) {
         }
         if (!flag) {
             scene.remove(square);
+        }
+    }
+}
+
+//Clearing Functions
+function deletePlacedSquares() {
+    while (scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+    }
+}
+
+function clear() {
+    for (let row of hoverBoxes) {
+            for (let square of row) {
+                square.visible = false;
+                square.material.opacity = 0;
+                square.children[0].material.opacity = 0;
+        }
+    }
+    for (let row of grid) {
+            for (let square of row) {
+                square.material.color.set(0xffffff);
         }
     }
 }
