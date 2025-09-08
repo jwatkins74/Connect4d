@@ -5,6 +5,7 @@
     display: flex;
     justify-content: center;
 }
+
 button {
     margin: auto auto;
     color: black;
@@ -17,13 +18,14 @@ button {
     margin-top: 20px;
 }
 
-body{
+body {
     background-color: #4ebeef;
     margin: 0;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
 }
+
 .winner {
     display: none;
     position: fixed;
@@ -40,7 +42,7 @@ body{
     width: fit-content;
 }
 
-.restart{
+.restart {
     pointer-events: auto;
     display: none;
     color: black;
@@ -52,6 +54,7 @@ body{
     font-size: 20px;
     background-color: darkolivegreen;
 }
+
 #homebutton {
     pointer-events: auto;
     color: black;
@@ -63,6 +66,7 @@ body{
     font-size: 20px;
     background-color: darkolivegreen;
 }
+
 #buttonDiv {
     position: fixed;
     pointer-events: none;
@@ -75,6 +79,7 @@ body{
 button:hover {
     border-color: cadetblue;
 }
+
 #homebutton:hover {
     border-color: cadetblue;
 }

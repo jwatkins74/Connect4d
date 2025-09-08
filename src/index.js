@@ -49,7 +49,7 @@ function MainPage() {
         divWinner.id = "winner";
         divWinner.classList.add("winner");
         const p = document.createElement("p");
-        p.id="text";
+        p.id = "text";
         divWinner.appendChild(p);
 
         const restartButton = document.createElement("button");
@@ -77,7 +77,7 @@ function MainPage() {
     howButton.addEventListener("click", () => {
         removeAllElements();
         AboutPage();
-    
+
     })
 }
 
@@ -91,7 +91,7 @@ function AboutPage() {
     let textdiv = createDiv();
     const text = document.createElement("p");
     textdiv.appendChild(text);
-    text.innerText = "3D Connect 4 is a two player game where each player tries to connect 4 squares of their color, in any direction, the first to do so wins the game." 
+    text.innerText = "3D Connect 4 is a two player game where each player tries to connect 4 squares of their color, in any direction, the first to do so wins the game."
 
     const controls = ["Hold Left click/ drag to rotate camera", "Right click/ use two fingers to move camera", "Click/ touch to place a block (aim at the grid)"];
     const ul = document.createElement("ul");
